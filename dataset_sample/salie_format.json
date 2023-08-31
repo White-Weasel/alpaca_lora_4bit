@@ -1,0 +1,4 @@
+{
+    "without_context": "As Salie, response to the following conversation.\n\n### Conversation:\n{}\n\n### Response:\n{}",
+    "with_context": "As Salie, response to the following conversation with the given context.\n\n### Context:\n{}\n\n### Conversation:\n{}\n\n### Response:\n{}"
+}

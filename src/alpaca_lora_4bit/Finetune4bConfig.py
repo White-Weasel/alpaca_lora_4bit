@@ -2,7 +2,7 @@ import os
 class Finetune4bConfig:
     """Config holder for LLaMA 4bit finetuning
     """
-    def __init__(self, dataset: str, ds_type: str,
+    def __init__(self, dataset: str, ds_type: str, data_format: str,
                  lora_out_dir: str, lora_apply_dir: str, resume_checkpoint: str,
                  llama_q4_config_dir: str, llama_q4_model: str,
                  mbatch_size: int, batch_size: int,
@@ -20,6 +20,7 @@ class Finetune4bConfig:
         """
         Args:
             dataset (str): Path to dataset file
+            data_format (str): Path to dataset template json file
             ds_type (str): Dataset structure format
             lora_out_dir (str): Directory to place new LoRA
             lora_apply_dir (str): Path to directory from which LoRA has to be applied before training
@@ -53,6 +54,7 @@ class Finetune4bConfig:
             xformers (bool): use xformers or not
         """
         self.dataset = dataset
+        self.data_format = data_format
         self.ds_type = ds_type
         self.lora_out_dir = lora_out_dir
         self.lora_apply_dir = lora_apply_dir
@@ -94,7 +96,7 @@ class Finetune4bConfig:
 
 
     def __str__(self) -> str:
-        s = f"\nParameters:\n{'config':-^20}\n{self.dataset=}\n{self.ds_type=}\n{self.lora_out_dir=}\n{self.lora_apply_dir=}\n{self.llama_q4_config_dir=}\n{self.llama_q4_model=}\n\n" +\
+        s = f"\nParameters:\n{'config':-^20}\n{self.dataset=}\n{self.data_format=}\n{self.ds_type=}\n{self.lora_out_dir=}\n{self.lora_apply_dir=}\n{self.llama_q4_config_dir=}\n{self.llama_q4_model=}\n\n" +\
         f"{'training':-^20}\n" +\
         f"{self.mbatch_size=}\n{self.batch_size=}\n{self.gradient_accumulation_steps=}\n{self.epochs=}\n{self.lr=}\n{self.cutoff_len=}\n" +\
         f"{self.lora_r=}\n{self.lora_alpha=}\n{self.lora_dropout=}\n{self.val_set_size=}\n" +\

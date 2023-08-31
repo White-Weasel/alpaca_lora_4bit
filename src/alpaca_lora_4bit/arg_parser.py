@@ -18,7 +18,7 @@ def parse_commandline():
     parser_training = parser.add_argument_group("training")
 
     # Config args group
-    parser_config.add_argument("--ds_type", choices=["txt", "alpaca", "gpt4all", "bluemoon"], default="alpaca", required=False,
+    parser_config.add_argument("--ds_type", choices=["txt", "alpaca", "gpt4all", "bluemoon", "salie"], default="alpaca", required=False,
         help="Dataset structure format. Default: %(default)s"
     )
     parser_config.add_argument("--lora_out_dir", default="alpaca_lora", required=False,
@@ -59,6 +59,8 @@ def parse_commandline():
 
     # Data args
     parser_training.add_argument("--txt_row_thd", default=-1, type=int, help="Custom thd for txt rows.")
+    parser_config.add_argument("--data_format", default="./dataset_sample/salie_format.json", required=False,
+                               help="Path to data template json file.")
     parser_training.add_argument("--use_eos_token", default=1, type=int, help="Use eos token instead if padding with 0. enable with 1, disable with 0.")
 
     # V2 model support
@@ -82,6 +84,7 @@ def get_config() -> Finetune4bConfig:
     args = parse_commandline()
     return Finetune4bConfig(
         dataset=args["dataset"],
+        data_format=args["data_format"],
         ds_type=args["ds_type"],
         lora_out_dir=args["lora_out_dir"],
         lora_apply_dir=args["lora_apply_dir"],

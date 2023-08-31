@@ -1,3 +1,5 @@
+import json
+
 import torch
 
 from abc import ABC, abstractmethod
@@ -12,6 +14,7 @@ import os
 class ATrainData(ABC):
     """
     """
+
     @abstractmethod
     def __init__(self, dataset: str, val_set_size: int, tokenizer, cutoff_len: int) -> None:
         """
@@ -68,8 +71,8 @@ class TrainTxt(ATrainData):
                 "attention_mask": result["attention_mask"],
             }
             if (
-                d["input_ids"][-1] != self.tokenizer.eos_token_id
-                and len(d["input_ids"]) < self.cutoff_len
+                    d["input_ids"][-1] != self.tokenizer.eos_token_id
+                    and len(d["input_ids"]) < self.cutoff_len
             ):
                 d["input_ids"].append(self.tokenizer.eos_token_id)
                 d["attention_mask"].append(1)
@@ -142,8 +145,8 @@ class TrainSAD(ATrainData):
                 padding=False,
             )
             if (
-                result["input_ids"][-1] != self.tokenizer.eos_token_id
-                and len(result["input_ids"]) < self.cutoff_len
+                    result["input_ids"][-1] != self.tokenizer.eos_token_id
+                    and len(result["input_ids"]) < self.cutoff_len
             ):
                 result["input_ids"].append(self.tokenizer.eos_token_id)
                 result["attention_mask"].append(1)
@@ -167,10 +170,13 @@ class TrainSAD(ATrainData):
             train_val = data["train"].train_test_split(
                 test_size=self.val_set_size, shuffle=True, seed=42  # ! Seed = 42 (?)
             )
-            self.train_data = train_val["train"].shuffle().map(lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
-            self.val_data = train_val["test"].shuffle().map(lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
+            self.train_data = train_val["train"].shuffle().map(
+                lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
+            self.val_data = train_val["test"].shuffle().map(
+                lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
         else:
-            self.train_data = data["train"].shuffle().map(lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
+            self.train_data = data["train"].shuffle().map(
+                lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
             self.val_data = None
 
     # Auxiliary methods
@@ -188,7 +194,37 @@ class TrainSAD(ATrainData):
     def generate_and_tokenize_prompt(self, data_point, **kwargs):
         prompt = self.generate_prompt(data_point, **kwargs)
         return self.tokenize(prompt, **kwargs)
-    
+
+
+class TrainSalie(TrainSAD):
+    def __init__(self, dataset: str, val_set_size: int, tokenizer, cutoff_len, format) -> None:
+        """
+        Args:
+            dataset (str): Path to dataset
+            val_set_size (int) : Size of validation set
+            tokenizer (_type_): Tokenizer
+            format (str): Path to dataset format
+        """
+        super().__init__(dataset, val_set_size, tokenizer, cutoff_len)
+        f = open(format, 'r')
+        self.format = json.load(f)
+        f.close()
+
+    # Auxiliary methods
+    def generate_prompt(self, data_point, **kwargs):
+        if data_point.get('context'):
+            return self.format['with_context'].format(
+                data_point["context"],
+                data_point["input"],
+                data_point["output"]
+            )
+        else:
+            return self.format['without_context'].format(
+                data_point["input"],
+                data_point["output"]
+            )
+
+
 # Blue Moon like Data prompt-response
 class TrainBlueMoon(ATrainData):
     def __init__(self, dataset: str, val_set_size: int, tokenizer, cutoff_len) -> None:
@@ -205,8 +241,8 @@ class TrainBlueMoon(ATrainData):
                 padding=False,
             )
             if (
-                result["input_ids"][-1] != self.tokenizer.eos_token_id
-                and len(result["input_ids"]) < self.cutoff_len
+                    result["input_ids"][-1] != self.tokenizer.eos_token_id
+                    and len(result["input_ids"]) < self.cutoff_len
             ):
                 result["input_ids"].append(self.tokenizer.eos_token_id)
                 result["attention_mask"].append(1)
@@ -230,10 +266,13 @@ class TrainBlueMoon(ATrainData):
             train_val = data["train"].train_test_split(
                 test_size=self.val_set_size, shuffle=True, seed=42  # ! Seed = 42 (?)
             )
-            self.train_data = train_val["train"].shuffle().map(lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
-            self.val_data = train_val["test"].shuffle().map(lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
+            self.train_data = train_val["train"].shuffle().map(
+                lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
+            self.val_data = train_val["test"].shuffle().map(
+                lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
         else:
-            self.train_data = data["train"].shuffle().map(lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
+            self.train_data = data["train"].shuffle().map(
+                lambda x: self.generate_and_tokenize_prompt(x, use_eos_token=use_eos_token))
             self.val_data = None
 
     # Auxiliary methods
@@ -247,9 +286,11 @@ class TrainBlueMoon(ATrainData):
 
     def generate_and_tokenize_prompt(self, data_point, **kwargs):
         prompt = self.generate_prompt(data_point, **kwargs)
-        return self.tokenize(prompt, **kwargs)    
+        return self.tokenize(prompt, **kwargs)
 
-# GPT4All-like Data
+    # GPT4All-like Data
+
+
 class TrainGPT4All(ATrainData):
     def __init__(self, dataset: str, val_set_size: int, tokenizer, cutoff_len) -> None:
         super().__init__(dataset, val_set_size, tokenizer, cutoff_len)
@@ -265,7 +306,8 @@ class TrainGPT4All(ATrainData):
 
         out = {"labels": [], "attention_mask": []}
         for i, (prompt, response) in enumerate(zip(examples["prompt"], examples["response"])):
-            input_tokens = self.tokenizer(prompt, truncation=True, max_length=max_length // 2, return_tensors="pt")["input_ids"].squeeze()
+            input_tokens = self.tokenizer(prompt, truncation=True, max_length=max_length // 2, return_tensors="pt")[
+                "input_ids"].squeeze()
             if input_tokens.dim() == 0:
                 input_tokens = input_tokens.unsqueeze(0)
 
@@ -275,7 +317,8 @@ class TrainGPT4All(ATrainData):
             # but we subtract one since we want to add eos token
             remaining_tokens = max_length - input_len - len(newline_tokens) + 1
             # remove bos
-            target_tokens = self.tokenizer(response, truncation=True, max_length=remaining_tokens, return_tensors="pt")["input_ids"].squeeze()[1:]
+            target_tokens = self.tokenizer(response, truncation=True, max_length=remaining_tokens, return_tensors="pt")[
+                                "input_ids"].squeeze()[1:]
 
             input_ids[i, :input_len] = input_tokens
             # add newline between prompt and response
