@@ -212,17 +212,17 @@ class TrainSalie(TrainSAD):
 
     # Auxiliary methods
     def generate_prompt(self, data_point, **kwargs):
-        if data_point.get('context'):
-            return self.format['with_context'].format(
-                data_point["context"],
-                data_point["input"],
-                data_point["output"]
-            )
-        else:
-            return self.format['without_context'].format(
-                data_point["input"],
-                data_point["output"]
-            )
+        # if data_point.get('context'):
+        #     return self.format['with_context'].format(
+        #         data_point["context"],
+        #         data_point["input"],
+        #         data_point["output"]
+        #     )
+        # else:
+        return self.format['without_context'].format(
+            data_point["input"],
+            data_point["output"]
+        )
 
 
 # Blue Moon like Data prompt-response
