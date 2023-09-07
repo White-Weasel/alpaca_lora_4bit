@@ -11,14 +11,14 @@ patch_encode_func = False
 
 def load_model_llama(*args, **kwargs):
 
-    config_path = '../models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/'
-    model_path = '../models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/llama-13b-4bit-128g.safetensors'
-    lora_path = '../lora/Salie/'
+    config_path = 'models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/'
+    model_path = 'models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/llama-13b-4bit-128g.safetensors'
+    lora_path = 'loras/binhgiangnguyendanh_test_salie_lora/'
 
     print("Loading {} ...".format(model_path))
     t0 = time.time()
 
-    model, tokenizer = load_llama_model_4bit_low_ram(config_path, model_path, groupsize=-1, is_v1_model=True)
+    model, tokenizer = load_llama_model_4bit_low_ram(config_path, model_path, groupsize=128, is_v1_model=True)
 
     model = PeftModel.from_pretrained(model, lora_path, device_map={'': 0}, torch_dtype=torch.float32)
     print('{} Lora Applied.'.format(lora_path))
