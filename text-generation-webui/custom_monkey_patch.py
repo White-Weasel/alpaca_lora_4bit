@@ -11,9 +11,9 @@ patch_encode_func = False
 
 def load_model_llama(*args, **kwargs):
 
-    config_path = 'models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/'
-    model_path = 'models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/llama-13b-4bit-128g.safetensors'
-    lora_path = 'loras/binhgiangnguyendanh_test_salie_lora/'
+    config_path = './models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/'
+    model_path = './models/Neko-Institute-of-Science_LLaMA-13B-4bit-128g/llama-13b-4bit-128g.safetensors'
+    lora_path = './loras/binhgiangnguyendanh_test_salie_lora/'
 
     print("Loading {} ...".format(model_path))
     t0 = time.time()
