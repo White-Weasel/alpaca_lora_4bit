@@ -11,4 +11,3 @@ python download-model.py binhgiangnguyendanh/test_salie_lora --threads 8
 
 mv text-generation-webui-tmp/* text-generation-webui/
 rm -rf text-generation-webui-tmp
-python text-generation-webui/server.py
